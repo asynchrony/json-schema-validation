@@ -28,8 +28,11 @@ import org.junit.Test;
 public class JacksonSchemaTest {
 	private final String schema = 
 			"{" +
+				"\"title\": \"this is a test title ...\"," +
+				"\"description\": \"this is a test description ... \"," +
 				"\"type\": \"string\"," +
-				"\"enum\": [\"one\", \"two\", \"three\"]" +
+				"\"enum\": [\"one\", \"two\", \"three\"]," +
+				"\"optional\": false" +
 			"}";
 	
 	private final String schema2 = 
@@ -80,8 +83,9 @@ public class JacksonSchemaTest {
 		JsonNode schemaNode = mapper.readTree(schema);
 		JacksonSchema jschema = new JacksonSchema(mapper, schemaNode);
 		List<JSONValidator> validators = jschema.validators;
-		assertThat(validators.get(0).getClass().getName(), is("eu.vahlas.json.schema.impl.validators.TypeValidator") );
-		assertThat(validators.get(1).getClass().getName(), is("eu.vahlas.json.schema.impl.validators.EnumValidator") );
+		assertThat(validators.get(1).getClass().getName(), is("eu.vahlas.json.schema.impl.validators.NoOpValidator") );
+		assertThat(validators.get(2).getClass().getName(), is("eu.vahlas.json.schema.impl.validators.TypeValidator") );
+		assertThat(validators.get(3).getClass().getName(), is("eu.vahlas.json.schema.impl.validators.EnumValidator") );
 	}
 	
 	@Test

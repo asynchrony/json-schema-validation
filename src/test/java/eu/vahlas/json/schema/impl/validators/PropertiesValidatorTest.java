@@ -58,7 +58,7 @@ public class PropertiesValidatorTest {
 		
 		JsonNode ppNode = schemaNode.get(PropertiesValidator.PROPERTY);
 		
-		v = new PropertiesValidator(ppNode);
+		v = new PropertiesValidator(ppNode, mapper);
 	}
 	
 	@Test

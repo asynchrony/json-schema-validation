@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +40,11 @@ public class PropertiesValidator implements JSONValidator, Serializable {
 	
 	protected Map<String, JacksonSchema> schemas;
 	
-	public PropertiesValidator(JsonNode propertiesNode) {
+	public PropertiesValidator(JsonNode propertiesNode, ObjectMapper mapper) {
 		schemas = new HashMap<String, JacksonSchema>();	
 		for ( Iterator<String> it = propertiesNode.getFieldNames(); it.hasNext(); ) {
-			String pname = it.next(); 
-			schemas.put(pname, 
-						new JacksonSchema( propertiesNode.get( pname ) )
-					);
+			String pname = it.next();
+			schemas.put(pname, new JacksonSchema( mapper, propertiesNode.get( pname ) ));
 		}
 	}
 	
@@ -63,6 +62,7 @@ public class PropertiesValidator implements JSONValidator, Serializable {
 		for ( String key : schemas.keySet() ) {
 			JacksonSchema propertySchema = schemas.get(key);
 			JsonNode propertyNode = node.get(key);
+			
 			if ( propertyNode != null ) {
 				errors.addAll( propertySchema.validate(propertyNode, node, at + "." + key) );
 			} else {

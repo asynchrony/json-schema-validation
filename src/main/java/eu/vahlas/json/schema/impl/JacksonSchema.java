@@ -36,6 +36,7 @@ import eu.vahlas.json.schema.JSONSchemaException;
 import eu.vahlas.json.schema.impl.validators.AdditionalPropertiesValidator;
 import eu.vahlas.json.schema.impl.validators.MaximumValidator;
 import eu.vahlas.json.schema.impl.validators.MinimumValidator;
+import eu.vahlas.json.schema.impl.validators.NoOpValidator;
 import eu.vahlas.json.schema.impl.validators.PropertiesValidator;
 import eu.vahlas.json.schema.impl.validators.TypeValidator;
 
@@ -67,9 +68,23 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			String pname = pnames.next();			
 			JsonNode n = schemaNode.get(pname);
 			
+			// If a $ref node is contained in the node, then we replace the node with the target of the ref
+			// This is an experimental implementation based on the assumption that the $ref property
+			// contains a valid URL
+			JsonNode refNode = n.get("$ref");
+			if ( refNode != null ) {
+				try {
+					n = mapper.readTree( new URL( refNode.getTextValue() ).openStream() );
+				} catch (Exception e) {
+					LOG.error("$ref resolution failed: " + refNode.getTextValue(), e);
+				}
+			}
+			
 			// Optional must be defined a priori
-			if ( "optional".equals(pname) && n.isBoolean() && n.getBooleanValue() ) {
-				optional = true;
+			if ( "optional".equals(pname) ) {
+				if ( n.isBoolean() && n.getBooleanValue() ) 
+					optional = true;
+				
 				continue;
 			}
 			
@@ -119,10 +134,17 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			if ( n != null ) {
 				try {
 					Class<JSONValidator> clazz = (Class<JSONValidator>) Class.forName("eu.vahlas.json.schema.impl.validators." + className);
-					Constructor<JSONValidator> c = clazz.getConstructor(JsonNode.class);
-					validators.add(c.newInstance(n));
+					Constructor<JSONValidator> c = null;
+					try {
+						c = clazz.getConstructor(JsonNode.class);
+						validators.add(c.newInstance(n));
+					} catch (NoSuchMethodException nsme) {
+						c = clazz.getConstructor( new Class[] {JsonNode.class, ObjectMapper.class} );
+						validators.add(c.newInstance(n, mapper));
+					}
 				} catch (Exception e) {
-					LOG.error("Could not load validator " + pname, e);
+					LOG.warn("Could not load validator " + pname, e);
+					validators.add(new NoOpValidator(n));
 				}
 			} else {
 				if ( TypeValidator.PROPERTY.equals( pname ) )
