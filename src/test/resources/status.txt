@@ -43,6 +43,8 @@ Implementation status for: 5. Core Schema Definition
 5.23 divisibleBy			OK
 5.24 disallow				OK
 5.25 extends				TODO
+X.XX schema					TODO
+X.XX $ref					IN PG (very experimental implementation)
 
 ==========================================================
 Remaining TODO's
@@ -58,7 +60,7 @@ QUESTIONS
 "default": does it means that if no value is provided for
 a property we should validate against the default value ?
 
-"divisibleBy": has sense only for integers
+"divisibleBy": has sense only for integers => NO TODO
 
 "format" won't be implemented in the early releases, we can
 try later on
