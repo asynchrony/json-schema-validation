@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Export-Package: eu.vahlas.json.schema,eu.vahlas.json.schema.impl
+Bundle-Name: json-schema-validator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.codehaus.jackson;bundle-version="1.6.2",org.slf4j.api;bundle-version="1.6.1"
+Bundle-Vendor: Nicholas Vahlas
+Build-Jdk: 1.6.0_24
+Bundle-Version: 0.0.1
+Bnd-LastModified: 1310495823491
+Bundle-ManifestVersion: 2
+Bundle-Description: A Java implementation of the JSON Schema specification (http://json-schema.org)
+Bundle-License: LICENSE
+Bundle-SymbolicName: eu.vahlas.json.schema.validator;singleton=true
