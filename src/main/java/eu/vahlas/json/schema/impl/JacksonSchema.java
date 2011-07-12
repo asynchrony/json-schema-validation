@@ -71,12 +71,12 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			// If a $ref node is contained in the node, then we replace the node with the target of the ref
 			// This is an experimental implementation based on the assumption that the $ref property
 			// contains a valid URL
-			JsonNode refNode = n.get("$ref");
-			if ( refNode != null ) {
+			if (pname.equals("$ref")) {
 				try {
-					n = mapper.readTree( new URL( refNode.getTextValue() ).openStream() );
+					JsonNode refNode = mapper.readTree(new URL(n.getTextValue()).openStream());
+					read(refNode);
 				} catch (Exception e) {
-					LOG.error("$ref resolution failed: " + refNode.getTextValue(), e);
+					LOG.error("$ref resolution failed: " + n.getTextValue(), e);
 				}
 			}
 			
@@ -133,7 +133,8 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			String className = Character.toUpperCase( pname.charAt(0) ) + pname.substring(1) + "Validator";
 			if ( n != null ) {
 				try {
-					Class<JSONValidator> clazz = (Class<JSONValidator>) Class.forName("eu.vahlas.json.schema.impl.validators." + className);
+					Class<JSONValidator> clazz = (Class<JSONValidator>) getClass().getClassLoader().loadClass(
+							"eu.vahlas.json.schema.impl.validators." + className);
 					Constructor<JSONValidator> c = null;
 					try {
 						c = clazz.getConstructor(JsonNode.class);
@@ -154,10 +155,12 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 	}
 	
 	// --------------------------------------------------- Implement JSONValidator
+	@Override
 	public List<String> validate(JsonNode jsonNode, String at) {
 		return validate(jsonNode, null, at);
 	}
 	
+	@Override
 	public List<String> validate(JsonNode jsonNode, JsonNode parent, String at) {
 		List<String> errors = new ArrayList<String>();
 		for ( JSONValidator v : validators ) {
