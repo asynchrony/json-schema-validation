@@ -133,7 +133,8 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			String className = Character.toUpperCase( pname.charAt(0) ) + pname.substring(1) + "Validator";
 			if ( n != null ) {
 				try {
-					Class<JSONValidator> clazz = (Class<JSONValidator>) Class.forName("eu.vahlas.json.schema.impl.validators." + className);
+					Class<JSONValidator> clazz = (Class<JSONValidator>) getClass().getClassLoader().loadClass(
+							"eu.vahlas.json.schema.impl.validators." + className);
 					Constructor<JSONValidator> c = null;
 					try {
 						c = clazz.getConstructor(JsonNode.class);
