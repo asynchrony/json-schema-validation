@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.vahlas.json.schema</groupId>
 	<artifactId>validator</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>0.0.1</version>
 	<name>json-schema-validator</name>
 	<description>A Java implementation of the JSON Schema specification (http://json-schema.org)</description>
@@ -51,14 +51,14 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
-			<version>1.5.1</version>
+			<version>1.6.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.5.1</version>
+			<version>1.6.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -66,6 +66,16 @@
 	<build>
 		<finalName>${groupId}.${artifactId}-${version}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<archive>
+						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -76,32 +86,13 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.0.0</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Manifest-Version>1.0</Manifest-Version>
-						<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-						<Bundle-Name>${name}</Bundle-Name>
-						<Bundle-SymbolicName>${groupId}.${artifactId};singleton=true</Bundle-SymbolicName>
-						<Bundle-Version>${version}</Bundle-Version>
-						<Bundle-Vendor>Nicholas Vahlas</Bundle-Vendor>
-						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
-						<Require-Bundle>org.codehaus.jackson;bundle-version="1.6.2"</Require-Bundle>
-						<Export-Package>eu.vahlas.json.schema,eu.vahlas.json.schema.impl,eu.vahlas.json.schema.impl.validators</Export-Package>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>1.5</version>
 				<executions>
 					<execution>
 						<id>set-osgi-version</id>
-						<phase>verify</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>parse-version</goal>
 						</goals>
@@ -115,7 +106,7 @@
 				<executions>
 					<execution>
 						<id>attach-sources</id>
-						<phase>verify</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
 						</goals>
