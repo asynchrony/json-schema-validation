@@ -32,7 +32,7 @@ public class JSONSchemaTest {
 		JSONSchema schema = schemaProvider.getSchema( new URL("http://json-schema.org/card") );
 		
 		// Validates a JSON Instance object stored in a file against the schema
-		InputStream instanceIS = Thread.currentThread().getContextClassLoader().getResourceAsStream("card.json");
+		InputStream instanceIS = getClass().getResourceAsStream("/card.json");
 		List<String> errors = schema.validate(instanceIS);
 		
 		assertThat(errors.size(), is(4));

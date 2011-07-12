@@ -71,12 +71,12 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 			// If a $ref node is contained in the node, then we replace the node with the target of the ref
 			// This is an experimental implementation based on the assumption that the $ref property
 			// contains a valid URL
-			JsonNode refNode = n.get("$ref");
-			if ( refNode != null ) {
+			if (pname.equals("$ref")) {
 				try {
-					n = mapper.readTree( new URL( refNode.getTextValue() ).openStream() );
+					JsonNode refNode = mapper.readTree(new URL(n.getTextValue()).openStream());
+					read(refNode);
 				} catch (Exception e) {
-					LOG.error("$ref resolution failed: " + refNode.getTextValue(), e);
+					LOG.error("$ref resolution failed: " + n.getTextValue(), e);
 				}
 			}
 			
@@ -154,10 +154,12 @@ public class JacksonSchema implements JSONSchema, JSONValidator, Serializable {
 	}
 	
 	// --------------------------------------------------- Implement JSONValidator
+	@Override
 	public List<String> validate(JsonNode jsonNode, String at) {
 		return validate(jsonNode, null, at);
 	}
 	
+	@Override
 	public List<String> validate(JsonNode jsonNode, JsonNode parent, String at) {
 		List<String> errors = new ArrayList<String>();
 		for ( JSONValidator v : validators ) {
